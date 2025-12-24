@@ -1,0 +1,10 @@
+Virtual DOM
+The Virtual DOM is a lightweight copy of the real browser DOM that React keeps in memory. When something changes in your app (like state or props), React first updates this Virtual DOM instead of directly changing the real DOM. Then it compares the new Virtual DOM with the previous one to find what actually changed. This makes updates faster and improves performance because changing the real DOM is slow.
+
+
+Reconciliation
+Reconciliation is the process React uses to compare the old Virtual DOM with the new Virtual DOM after a change. During this process, React figures out the minimum number of updates needed to make the real DOM match the new UI. Instead of re-rendering everything, React updates only the parts that changed. This is why React apps feel fast and efficient.
+
+
+Fiber
+Fiber is the internal engine (or new architecture) React uses to perform reconciliation in a smarter way. It breaks the rendering work into small units so React can pause, resume, or prioritize tasks like animations and user interactions. Because of Fiber, React can keep the app responsive even when it has a lot of components to update.
