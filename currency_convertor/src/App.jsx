@@ -37,8 +37,8 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-blue-200">
-      <div className="bg-blue-100 p-8 rounded-2xl shadow-lg w-[420px] text-gray-800 transition-colors">
+    <div className="min-h-screen flex items-center justify-center bg-blue-100">
+      <div className="bg-gray-100 p-8 rounded-2xl shadow-lg w-[420px] text-gray-800 transition-colors">
 
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
