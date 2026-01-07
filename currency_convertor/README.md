@@ -4,23 +4,21 @@ A simple and responsive React Currency Converter that converts amounts between d
 
 🚀 Features
 
-Convert between multiple currencies
-Swap “From” and “To” currencies 🔄
-Dynamic currency dropdowns
-Loading indicator while converting
-Responsive UI (Tailwind CSS)
+1. Convert between multiple currencies
+2. Swap “From” and “To” currencies 🔄
+3. Dynamic currency dropdowns
+4. Loading indicator while converting
+5. Responsive UI (Tailwind CSS)
 
-🌐 Live Preview
-
-👉 Live Demo: http://localhost:5173
+🌐 Live Preview : http://localhost:5173
 
 
 🛠️ Tech Stack
 
-React (Vite)
-JavaScript (ES6+)
-Tailwind CSS
-Frankfurter API
+1. React (Vite)
+2. JavaScript (ES6+)
+3. Tailwind CSS
+4. Frankfurter API
 
 
 👩‍💻 Author
