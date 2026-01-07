@@ -1,101 +1,112 @@
-import { useState, useCallback, useEffect, useRef } from 'react'
+import { useState, useEffect } from "react";
 
 function App() {
-  const [length, setLength] = useState(8)
-  const [numberAllowed, setNumberAllowed] = useState(false)
-  const [charAllowed, setCharAllowed] = useState(false)
-  const [password, setPassword] = useState("")
+  const [amount, setAmount] = useState(1);
+  const [fromCurrency, setFromCurrency] = useState("USD");
+  const [toCurrency, setToCurrency] = useState("INR");
+  const [currencies, setCurrencies] = useState([]);
+  const [convertedAmount, setConvertedAmount] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  const passwordRef = useRef(null)
-
-  const passwordGenerator = useCallback(() => {
-    let pass = ""
-    let str = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
-    if (numberAllowed) str += "0123456789"
-    if (charAllowed) str += "!@#$%^&*-_+=[]{}~`"
-
-    for (let i = 1; i <= length; i++) {
-      let char = Math.floor(Math.random() * str.length + 1)
-      pass += str.charAt(char)
-    }
-
-    setPassword(pass)
-  }, [length, numberAllowed, charAllowed])
-
-  const copyPasswordToClipboard = useCallback(() => {
-    passwordRef.current?.select()
-    passwordRef.current?.setSelectionRange(0, 20)
-    window.navigator.clipboard.writeText(password)
-  }, [password])
-
+  // Fetch available currencies
   useEffect(() => {
-    passwordGenerator()
-  }, [length, numberAllowed, charAllowed, passwordGenerator])
+    fetch("https://api.frankfurter.app/currencies")
+      .then((res) => res.json())
+      .then((data) => setCurrencies(Object.keys(data)))
+      .catch((err) => console.error(err));
+  }, []);
+
+  // Convert amount when inputs change
+  useEffect(() => {
+    if (!amount) return;
+
+    setLoading(true);
+    fetch(
+      `https://api.frankfurter.app/latest?amount=${amount}&from=${fromCurrency}&to=${toCurrency}`
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        setConvertedAmount(data.rates[toCurrency]);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error(err);
+        setLoading(false);
+      });
+  }, [amount, fromCurrency, toCurrency]);
+
+  // Swap from and to currencies
+  const swapCurrencies = () => {
+    setFromCurrency(toCurrency);
+    setToCurrency(fromCurrency);
+  };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-900 px-4">
-      <div className="w-full max-w-sm mx-auto shadow-lg rounded-lg p-5 bg-gray-800 text-orange-500">
-        <h1 className="text-white text-center text-2xl font-semibold mb-5">
-          Password Generator
-        </h1>
-
-        <div className="flex flex-col sm:flex-row shadow rounded-lg overflow-hidden mb-4 bg-gray-700">
-          <input
-            type="text"
-            value={password}
-            className="outline-none w-full py-2 px-3 text-white"
-            placeholder="Password"
-            readOnly
-            ref={passwordRef}
-          />
+    <div className="min-h-screen flex items-center justify-center bg-blue-100 px-4">
+      <div className="bg-gray-100 p-6 sm:p-8 rounded-2xl shadow-lg w-full max-w-sm text-gray-800 transition-colors">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl font-bold text-blue-800">Currency Converter</h1>
           <button
-            onClick={copyPasswordToClipboard}
-            className="mt-2 sm:mt-0 sm:ml-2 bg-blue-700 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
+            onClick={swapCurrencies}
+            className="bg-blue-300 hover:bg-blue-400 text-white px-3 py-1 rounded transition"
+            title="Swap Currencies"
           >
-            Copy
+            🔄 Swap
           </button>
         </div>
 
-        <div className="flex flex-col gap-4">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:gap-3">
-            <label className="text-sm mb-1 sm:mb-0">Length: {length}</label>
-            <input
-              type="range"
-              min={8}
-              max={20}
-              value={length}
-              onChange={(e) => setLength(e.target.value)}
-              className="w-full sm:w-auto cursor-pointer"
-            />
+        {/* Amount Input */}
+        <div className="mb-4">
+          <label className="text-sm font-medium">Amount</label>
+          <input
+            type="number"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            className="w-full mt-1 p-2 rounded-lg border border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          />
+        </div>
+
+        {/* Currency Select */}
+        <div className="grid grid-cols-2 gap-4 mb-4">
+          <div>
+            <label className="text-sm font-medium">From</label>
+            <select
+              value={fromCurrency}
+              onChange={(e) => setFromCurrency(e.target.value)}
+              className="w-full mt-1 p-2 rounded-lg border border-blue-300 hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            >
+              {currencies.map((cur) => (
+                <option key={cur} value={cur}>
+                  {cur}
+                </option>
+              ))}
+            </select>
           </div>
 
-          <div className="flex flex-col sm:flex-row sm:items-center sm:gap-6">
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                id="numberInput"
-                checked={numberAllowed}
-                onChange={() => setNumberAllowed((prev) => !prev)}
-                className="h-4 w-4"
-              />
-              <label htmlFor="numberInput" className="text-sm">Numbers</label>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                id="characterInput"
-                checked={charAllowed}
-                onChange={() => setCharAllowed((prev) => !prev)}
-                className="h-4 w-4"
-              />
-              <label htmlFor="characterInput" className="text-sm">Characters</label>
-            </div>
+          <div>
+            <label className="text-sm font-medium">To</label>
+            <select
+              value={toCurrency}
+              onChange={(e) => setToCurrency(e.target.value)}
+              className="w-full mt-1 p-2 rounded-lg border border-blue-300 hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            >
+              {currencies.map((cur) => (
+                <option key={cur} value={cur}>
+                  {cur}
+                </option>
+              ))}
+            </select>
           </div>
+        </div>
+
+        {/* Result */}
+        <div className="bg-blue-100 p-4 rounded-lg font-semibold text-blue-800 text-center hover:bg-blue-50 transition">
+          {loading ? "Converting..." : `Converted Amount: ${convertedAmount ?? "-"}`}
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
